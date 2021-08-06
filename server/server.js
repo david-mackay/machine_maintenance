@@ -1,3 +1,4 @@
+
 /*
 |--------------------------------------------------------------------------
 | server.js -- The core of your server
@@ -28,7 +29,7 @@ const api = require("./api");
 // Server configuration below
 // TODO change connection URL after setting up your own database
 const mongoConnectionURL =
-  "mongodb+srv://weblab:jAT4po55IAgYWQgR@catbook-ylndp.mongodb.net/test?retryWrites=true&w=majority";
+  "mongodb+srv://unitedplastics_admin:unitedplastics_admin123@cluster0.axuj9.mongodb.net/Maintenance?retryWrites=true&w=majority";
 // TODO change database name to the name you chose
 const databaseName = "catbook";
 const options = { useNewUrlParser: true, useUnifiedTopology: true, dbName: databaseName};
