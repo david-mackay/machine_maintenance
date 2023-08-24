@@ -2,7 +2,7 @@
 document.getElementById('upload-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var formData = new FormData(this);
-    fetch('/upload_machine', {
+    fetch('http://127.0.0.1:5000/upload_machine', {
         method: 'POST',
         body: formData
     })
@@ -16,7 +16,7 @@ document.getElementById('frequency-form').addEventListener('submit', function (e
     e.preventDefault();
     var machineId = this.elements.machine_id.value;
     var frequency = this.elements.frequency.value;
-    fetch('/set_frequency', {
+    fetch('http://127.0.0.1:5000/set_frequency', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ machine_id: machineId, frequency: frequency })
@@ -28,7 +28,7 @@ document.getElementById('frequency-form').addEventListener('submit', function (e
 
 // Function to view all machines
 document.getElementById('view-machines-btn').addEventListener('click', function () {
-    fetch('/get_machines', {
+    fetch('http://127.0.0.1:5000/view_machines', {
         method: 'GET'
     })
     .then(response => response.json())
@@ -48,7 +48,6 @@ document.getElementById('view-machines-btn').addEventListener('click', function 
     })
     .catch(error => alert('Error fetching machines: ' + error));
 });
-
 function showSection(sectionId) {
     // Hide all sections
     document.getElementById('upload-section').style.display = 'none';
