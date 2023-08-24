@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Maintenance</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showSection('machines-section')">View Machines</a></li>
+            <li><a href="#" onclick="showSection('upload-section')">Upload Machine</a></li>
+            <li><a href="#" onclick="showSection('frequency-section')">Set Servicing Frequency</a></li>
+        </ul>
+    </nav>
+    <h1>Machine Maintenance</h1>
+
+    <!-- Upload Machine Form -->
+    <section id="upload-section">
+        <h2>Upload Machine</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+            <label>Description:</label>
+            <input type="text" name="description" required><br>
+            <label>Photo:</label>
+            <input type="file" name="photo" required><br>
+            <label>Default Frequency (Days):</label>
+            <input type="number" name="frequency"><br>
+            <label>Service By Date:</label>
+            <input type="date" name="service_by"><br>
+            <label>Notes:</label>
+            <textarea name="notes"></textarea><br>
+            <button type="submit">Upload</button>
+        </form>
+    </section>
+
+    <!-- Set Default Servicing Frequency Form -->
+    <section id="frequency-section">
+        <h2>Set Default Servicing Frequency</h2>
+        <form id="frequency-form">
+            <label>Machine ID:</label>
+            <input type="number" name="machine_id" required><br>
+            <label>Frequency (Days):</label>
+            <input type="number" name="frequency" required><br>
+            <button type="submit">Set Frequency</button>
+        </form>
+    </section>
+
+    <!-- View All Machines -->
+    <section id="machines-section">
+        <h2>All Machines</h2>
+        <button id="view-machines-btn">View Machines</button>
+        <div id="machines-list"></div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
