@@ -41,10 +41,13 @@ mail = Mail(app)
 
 @app.route("/upload_machine", methods=["POST"])
 def upload_machine():
+    machine_name = request.form["machine_name"]
     description = request.form["description"]
     frequency = request.form["frequency"]
     service_by = request.form["service_by"]
     notes = request.form["notes"]
+    user_id = request.form["user_id"]
+    #todo: get company_id from user_id, check_permissions
 
     photo = request.files["photo"]
     if photo and photo.filename != "":
