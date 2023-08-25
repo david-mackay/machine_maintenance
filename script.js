@@ -53,7 +53,41 @@ function showSection(sectionId) {
     document.getElementById('upload-section').style.display = 'none';
     document.getElementById('frequency-section').style.display = 'none';
     document.getElementById('machines-section').style.display = 'none';
+    document.getElementById('service-section').style.display = 'none';
 
     // Show the selected section
     document.getElementById(sectionId).style.display = 'block';
 }
+
+
+function loadMachineList() {
+    fetch('/get_machine_list', {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        var dropdown = document.getElementById('machine-dropdown');
+        data.forEach(machine => {
+            var option = document.createElement('option');
+            option.value = machine.machine_id;
+            option.text = machine.description;
+            dropdown.appendChild(option);
+        });
+    })
+    .catch(error => alert('Error fetching machine list: ' + error));
+}
+
+// Call the function to populate the dropdown when the page loads
+loadMachineList();
+
+document.getElementById('service-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    fetch('/service_machine', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => alert(data))
+    .catch(error => alert('Error logging service details: ' + error));
+});

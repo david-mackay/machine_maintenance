@@ -13,6 +13,7 @@
             <li><a href="#" onclick="showSection('machines-section')">View Machines</a></li>
             <li><a href="#" onclick="showSection('upload-section')">Upload Machine</a></li>
             <li><a href="#" onclick="showSection('frequency-section')">Set Servicing Frequency</a></li>
+            <li><a href="#" onclick="showSection('service-section')">Service a Machine</a></li>
         </ul>
     </nav>
     <h1>Machine Maintenance</h1>
@@ -55,6 +56,20 @@
         <button id="view-machines-btn">View Machines</button>
         <div id="machines-list"></div>
     </section>
+    <section id="service-section" class="hidden">
+    <h2>Service a Machine</h2>
+    <form id="service-form">
+        <label>Select Machine:</label>
+        <select name="machine_id" id="machine-dropdown"></select><br>
+        <label>Date of Service:</label>
+        <input type="date" name="service_date" required><br>
+        <label>Next Service Date:</label>
+        <input type="date" name="next_service_date" required><br>
+        <label>Notes:</label>
+        <textarea name="notes"></textarea><br>
+        <button type="submit">Log Service</button>
+    </form>
+</section>
 
     <script src="script.js"></script>
 </body>

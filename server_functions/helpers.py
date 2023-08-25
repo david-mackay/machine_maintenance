@@ -22,3 +22,4 @@ def check_upcoming_services():
 
     cursor.close()
     conn.close()
+

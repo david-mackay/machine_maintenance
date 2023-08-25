@@ -6,11 +6,6 @@ import os
 def upload_machine():
     machine_name = request.form["machine_name"]
     description = request.form["description"]
-    frequency = request.form["frequency"]
-    service_by = request.form["service_by"]
-    notes = request.form["notes"]
-    user_id = request.form["user_id"]
-    #todo: get company_id from user_id, check_permissions
 
     photo = request.files["photo"]
     if photo and photo.filename != "":
@@ -22,10 +17,10 @@ def upload_machine():
     conn = create_connection()
     cursor = conn.cursor()
     query = (
-        "INSERT INTO Machines (description, photo_url, default_frequency, service_by_date, notes) "
-        "VALUES (%s, %s, %s, %s, %s)"
+        "INSERT INTO Machines (machine_name, description, photo_url)"
+        "VALUES (%s, %s, %s)"
     )
-    cursor.execute(query, (description, photo_path, frequency, service_by, notes))
+    cursor.execute(query, (machine_name, description, photo_path))
 
     conn.commit()
     cursor.close()
@@ -34,62 +29,31 @@ def upload_machine():
     return "Machine uploaded successfully!"
 
 
-@app.route("/set_frequency", methods=["POST"])
-def set_frequency():
-    machine_id = request.form.get("machine_id")
-    frequency = int(request.form.get("frequency"))
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    query = "UPDATE Machines SET default_frequency = %s WHERE machine_id = %s"
-    cursor.execute(query, (frequency, machine_id))
-    conn.commit()
-
-    cursor.close()
-    conn.close()
-
-    return "Default servicing frequency updated successfully", 200
-
-
-@app.route("/set_default_frequency", methods=["POST"])
-def set_default_frequency():
-    machine_id = int(request.form.get("machine_id"))
-    frequency = int(request.form.get("frequency"))
-
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE machines SET default_frequency = ? WHERE machine_id = ?",
-        (frequency, machine_id),
-    )
-    conn.commit()
-    conn.close()
-
-    return "Default frequency updated successfully!"
-
-
-@app.route("/set_service_by_date", methods=["POST"])
-def set_service_by_date():
-    machine_id = int(request.form.get("machine_id"))
-    service_by = request.form.get("service_by")
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE machines SET service_by = ? WHERE machine_id = ?",
-        (service_by, machine_id),
-    )
-    conn.commit()
-    conn.close()
-
-    return "Service by date updated successfully!"
-
-
 @app.route("/view_machines", methods=["GET"])
 def view_machines():
     conn = create_connection()
     cursor = conn.cursor()
 
-    query = "SELECT * FROM Machines"
+    query = """
+        SELECT m.machine_id, m.machine_name, m.description, m.photo_url, 
+               ms.status, 
+               sl.service_date AS last_service_date, sl.next_service_date
+        FROM Machines AS m
+        LEFT JOIN (
+            SELECT machine_id, status
+            FROM machine_status
+            WHERE (machine_id, updated_at) IN (
+                SELECT machine_id, MAX(updated_at)
+                FROM machine_status
+                GROUP BY machine_id
+            )
+        ) AS ms ON m.machine_id = ms.machine_id
+        LEFT JOIN (
+            SELECT machine_id, MAX(service_date) AS service_date, next_service_date
+            FROM service_logs
+            GROUP BY machine_id
+        ) AS sl ON m.machine_id = sl.machine_id
+    """
     cursor.execute(query)
     machines = cursor.fetchall()
 
@@ -98,12 +62,12 @@ def view_machines():
         result.append(
             {
                 "machine_id": machine[0],
+                "machine_name": machine[1],
                 "description": machine[2],
                 "photo_url": machine[3],
-                "default_frequency": machine[4],
+                "status": machine[4],
                 "last_service_date": machine[5],
-                "service_by_date": machine[6],
-                "notes": machine[7],
+                "next_service_date": machine[6]
             }
         )
 
@@ -112,3 +76,45 @@ def view_machines():
 
     return jsonify(result)
 
+
+@app.route("/get_machine_list", methods=["GET"])
+def get_machine_list():
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT machine_id, machine_name FROM Machines"
+    cursor.execute(query)
+    machines = cursor.fetchall()
+
+    result = [{"machine_id": machine[0], "machine_name": machine[1]} for machine in machines]
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(result)
+
+@app.route("/service_machine", methods=["POST"])
+def service_machine():
+    machine_id = request.form.get("machine_id")
+    service_date = request.form.get("service_date")
+    next_service_date = request.form.get("next_service_date")
+    notes = request.form.get("notes")
+
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = (
+        "INSERT INTO ServiceLogs (machine_id, service_date, service_notes) "
+        "VALUES (%s, %s, %s)"
+    )
+    cursor.execute(query, (machine_id, service_date, notes))
+    conn.commit()
+
+    query = "UPDATE Machines SET service_by_date = %s WHERE machine_id = %s"
+    cursor.execute(query, (next_service_date, machine_id))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return "Service details logged successfully!"

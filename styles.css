@@ -1,12 +1,18 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
+    background-color: #1a1a1a;
+    color: #f0f0f0;
 }
 
-input {
+input,
+textarea {
     display: block;
     margin: 10px 0;
     padding: 5px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #f0f0f0;
 }
 
 button {
@@ -15,6 +21,11 @@ button {
     background-color: #007BFF;
     color: #fff;
     border: none;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 #main-section {
@@ -22,8 +33,9 @@ button {
 }
 
 h2 {
-    color: #333;
+    color: #f0f0f0;
 }
+
 nav {
     background-color: #333;
     overflow: hidden;
@@ -45,11 +57,11 @@ nav ul li a {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    transition: background-color 0.3s;
 }
 
 nav ul li a:hover {
-    background-color: #ddd;
-    color: black;
+    background-color: #007BFF;
 }
 
 section {
@@ -58,4 +70,12 @@ section {
 
 .hidden {
     display: none;
+}
+
+/* Responsive design for smaller screens */
+@media screen and (max-width: 768px) {
+    nav ul li {
+        float: none;
+        text-align: center;
+    }
 }
