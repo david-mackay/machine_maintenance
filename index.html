@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Machine Maintenance</title>
     <link rel="stylesheet" href="styles.css">
+
+<style>
+.machine-image {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+}
+</style>
+
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -12,14 +21,13 @@
         <ul>
             <li><a href="#" onclick="showSection('machines-section')">View Machines</a></li>
             <li><a href="#" onclick="showSection('upload-section')">Upload Machine</a></li>
-            <li><a href="#" onclick="showSection('frequency-section')">Set Servicing Frequency</a></li>
-            <li><a href="#" onclick="showSection('service-section')">Service a Machine</a></li>
+            <li><a href="#" onclick="loadMachineList(); showSection('service-section')">Service a Machine</a></li>
         </ul>
     </nav>
     <h1>Machine Maintenance</h1>
 
     <!-- Upload Machine Form -->
-    <section id="upload-section">
+    <section id="upload-section" class="hidden">
         <h2>Upload Machine</h2>
         <form id="upload-form" enctype="multipart/form-data">
             <label>Machine Name:</label>
@@ -27,50 +35,37 @@
             <label>Description:</label>
             <input type="text" name="description" required><br>
             <label>Photo:</label>
-            <input type="file" name="photo" required><br>
-            <label>Default Frequency (Days):</label>
-            <input type="number" name="frequency"><br>
-            <label>Service By Date:</label>
-            <input type="date" name="service_by"><br>
-            <label>Notes:</label>
-            <textarea name="notes"></textarea><br>
+            <input type="file" name="photo"><br> <!-- Removed 'required' -->
             <button type="submit">Upload</button>
         </form>
     </section>
 
-    <!-- Set Default Servicing Frequency Form -->
-    <section id="frequency-section">
-        <h2>Set Default Servicing Frequency</h2>
-        <form id="frequency-form">
-            <label>Machine ID:</label>
-            <input type="number" name="machine_id" required><br>
-            <label>Frequency (Days):</label>
-            <input type="number" name="frequency" required><br>
-            <button type="submit">Set Frequency</button>
-        </form>
-    </section>
-
     <!-- View All Machines -->
-    <section id="machines-section">
+    <section id="machines-section" class="hidden">
         <h2>All Machines</h2>
         <button id="view-machines-btn">View Machines</button>
         <div id="machines-list"></div>
     </section>
     <section id="service-section" class="hidden">
-    <h2>Service a Machine</h2>
-    <form id="service-form">
-        <label>Select Machine:</label>
-        <select name="machine_id" id="machine-dropdown"></select><br>
-        <label>Date of Service:</label>
-        <input type="date" name="service_date" required><br>
-        <label>Next Service Date:</label>
-        <input type="date" name="next_service_date" required><br>
-        <label>Notes:</label>
-        <textarea name="notes"></textarea><br>
-        <button type="submit">Log Service</button>
-    </form>
-</section>
-
+        <h2>Service a Machine</h2>
+        <form id="service-form">
+            <label>Select Machine:</label>
+            <select name="machine_id" id="machine-dropdown"></select><br>
+            <label>Date of Service:</label>
+            <input type="date" name="service_date" required><br>
+            <label>Next Service Date:</label>
+            <input type="date" name="next_service_date" required><br>
+            <label>Status:</label>
+            <select name="new_status">
+                <option value="operational">Operational</option>
+                <option value="needs service">Needs Service</option>
+                <option value="retired">Retired</option>
+            </select><br>
+            <label>Notes:</label>
+            <textarea name="notes"></textarea><br>
+            <button type="submit">Log Service</button>
+        </form>
+    </section>
     <script src="script.js"></script>
 </body>
 </html>

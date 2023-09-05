@@ -37,7 +37,7 @@ def view_machines():
     query = """
         SELECT m.machine_id, m.machine_name, m.description, m.photo_url, 
                ms.status, 
-               sl.service_date AS last_service_date, sl.next_service_date
+               sl.service_date AS last_service_date, sl.next_service_date, sl.notes  # Include notes
         FROM Machines AS m
         LEFT JOIN (
             SELECT machine_id, status
@@ -49,7 +49,7 @@ def view_machines():
             )
         ) AS ms ON m.machine_id = ms.machine_id
         LEFT JOIN (
-            SELECT machine_id, MAX(service_date) AS service_date, next_service_date
+            SELECT machine_id, MAX(service_date) AS service_date, next_service_date, notes  # Include notes
             FROM service_logs
             GROUP BY machine_id
         ) AS sl ON m.machine_id = sl.machine_id
@@ -67,7 +67,8 @@ def view_machines():
                 "photo_url": machine[3],
                 "status": machine[4],
                 "last_service_date": machine[5],
-                "next_service_date": machine[6]
+                "next_service_date": machine[6],
+                "notes": machine[7]  # Include notes
             }
         )
 
@@ -82,11 +83,17 @@ def get_machine_list():
     conn = create_connection()
     cursor = conn.cursor()
 
-    query = "SELECT machine_id, machine_name FROM Machines"
+    query = "SELECT * FROM Machines"
     cursor.execute(query)
     machines = cursor.fetchall()
 
-    result = [{"machine_id": machine[0], "machine_name": machine[1]} for machine in machines]
+    result = []
+    for machine in machines:
+        result.append({
+            "machine_id": machine[0],
+            "machine_name": machine[1],
+            "description": machine[2],
+        })
 
     cursor.close()
     conn.close()
@@ -99,22 +106,30 @@ def service_machine():
     service_date = request.form.get("service_date")
     next_service_date = request.form.get("next_service_date")
     notes = request.form.get("notes")
+    new_status = request.form.get("new_status")  # New
 
     conn = create_connection()
     cursor = conn.cursor()
 
+    # Insert into service_logs table
     query = (
-        "INSERT INTO ServiceLogs (machine_id, service_date, service_notes) "
-        "VALUES (%s, %s, %s)"
+        "INSERT INTO service_logs (machine_id, service_date, next_service_date, notes) "
+        "VALUES (%s, %s, %s, %s)"
     )
-    cursor.execute(query, (machine_id, service_date, notes))
+    cursor.execute(query, (machine_id, service_date, next_service_date, notes))
     conn.commit()
 
-    query = "UPDATE Machines SET service_by_date = %s WHERE machine_id = %s"
-    cursor.execute(query, (next_service_date, machine_id))
+    # Insert new status into machine_status table
+    query = (
+        "INSERT INTO machine_status (machine_id, status, updated_at) "
+        "VALUES (%s, %s, NOW())"
+    )
+    cursor.execute(query, (machine_id, new_status))
     conn.commit()
 
     cursor.close()
     conn.close()
 
-    return "Service details logged successfully!"
+    return "Service and status details logged successfully!"
+
+
